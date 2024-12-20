@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        /* CSS Reset */
+        * {
+            padding: 0;
+            box-sizing: border-box;
+            list-style: none;
+        }
+
+        /* 背景 */
+        body {
+            background: #212121;
+            overflow: hidden;
+        }
+
+        /* 側邊欄位 */
+        .sidebar {
+            position: absolute;
+            width: 100px;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .sidebar ul {
+            margin: 5px;
+        }
+
+        .sidebar li {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .sidebar button {
+            width: 100%;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: 0;
+            background: rgba(255, 255, 255, 0);
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: bold;
+            padding: 5px;
+        }
+
+        .sidebar button:active {
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .sidebar button:hover {
+            color: black;
+            cursor: pointer;
+        }
+
+        /*  時區選單 */
+        .zone-list {
+            position: absolute;
+            left: 110px;
+            top: 8px;
+            width: 120px;
+            height: 230px;
+            border: 0;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.3);
+            text-align: center;
+            display: none
+        }
+
+        .zone-list ul {
+            position: absolute;
+            margin: 5px;
+            width: 110px;
+        }
+
+        .zone-list .select-option {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            border-radius: 5px;
+            border: 0;
+            background: rgba(255, 255, 255, 0);
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: bold;
+            padding: 5px;
+        }
+
+        .select-option:active {
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .select-option:hover {
+            color: black;
+            cursor: pointer;
+        }
+
+        /* 時鐘透明度效果設定 */
+        .content {
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        /* 隱藏顯示的class */
+        .hidden {
+            display: none;
+        }
+
+        /* 時鐘1 */
+        #clock {
+            width: 350px;
+            height: 350px;
+            background: rgba(255, 255, 255, 1);
+            border-radius: 50%;
+            position: relative;
+            left: 75%;
+            border: 10px solid rgba(0, 0, 0, 1);
+            box-shadow: 5px 5px 15px #152b4a66,
+                inset 0px 0px 5px rgba(255, 255, 255, 0.75),
+                0px 0px 20px rgba(255, 255, 255, 1);
+            z-index: 900;
+        }
+
+        /* 時鐘中心點 */
+        #clock::before {
+            content: '';
+            position: absolute;
+            top: calc(50% - 9px);
+            left: calc(50% - 10px);
+            width: 20px;
+            height: 20px;
+            background: #000;
+            border-radius: 50%;
+            z-index: 1000;
+            box-shadow: 2px 2px 10px black;
+        }
+
+        /* 時鐘1時針 */
+        #hour {
+            width: 20%;
+            height: 10px;
+            background: #000;
+            border-radius: 5px;
+            position: absolute;
+            left: 30%;
+            top: calc(50% - 5px);
+            transform-origin: right center;
+            z-index: 10;
+        }
+
+        /* 時鐘1分針 */
+        #minute {
+            width: 40%;
+            height: 8px;
+            background: #000;
+            border-radius: 5px;
+            position: absolute;
+            left: 10%;
+            top: calc(50% - 4px);
+            transform-origin: right center;
+            z-index: 10;
+        }
+
+        /* 時鐘1秒針 */
+        #second {
+            width: 35%;
+            height: 4px;
+            background: #f00;
+            border-radius: 5px;
+            position: absolute;
+            left: 15%;
+            top: calc(50% - 2px);
+            transform-origin: right center;
+            z-index: 10;
+        }
+
+        /* 時鐘1的數字、圖片位置 */
+        #clock .numbers span {
+            position: absolute;
+            inset: 5px;
+            text-align: center;
+            color: #000;
+            font-size: 1.2em;
+            transform: rotate(calc(30deg * var(--i)));
+
+            .logo-0,
+            .logo-1,
+            .logo-2,
+            .logo-3,
+            .logo-4,
+            .logo-5,
+            .logo-6,
+            .logo-7,
+            .logo-8,
+            .logo-9,
+            .logo-10,
+            .logo-11 {
+                position: absolute;
+                z-index: -1;
+                transform: rotate(calc(-30deg * var(--i)));
+                width: 50px;
+                height: 70px;
+            }
+
+            .logo-0 {
+                width: 50px;
+                height: 70px;
+                left: calc(50% - 25px);
+                top: 2%;
+            }
+
+            .logo-1 {
+                width: 60px;
+                height: 50px;
+                left: 40%;
+                top: 5%;
+            }
+
+            .logo-2 {
+                width: 40px;
+                height: 50px;
+                left: 43%;
+                top: 5%;
+            }
+
+            .logo-3 {
+                width: 60px;
+                height: 40px;
+                left: 36%;
+                top: 2%;
+            }
+
+            .logo-4 {
+                width: 40px;
+                height: 40px;
+                left: 40%;
+                top: 5%;
+            }
+
+            .logo-5 {
+                width: 70px;
+                height: 30px;
+                left: 33%;
+                top: 5%;
+            }
+
+            .logo-6 {
+                width: 60px;
+                height: 40px;
+                left: 40%;
+                top: 7%;
+            }
+
+            .logo-7 {
+                width: 50px;
+                height: 30px;
+                left: 40%;
+                top: 10%;
+            }
+
+            .logo-8 {
+                width: 35px;
+                height: 60px;
+                left: 42%;
+                top: 2%;
+            }
+
+            .logo-9 {
+                width: 30px;
+                height: 40px;
+                left: 45%;
+                top: 6%;
+            }
+
+            .logo-10 {
+                width: 50px;
+                height: 30px;
+                left: 45%;
+                top: 10%;
+            }
+
+            .logo-11 {
+                width: 80px;
+                height: 30px;
+                left: 34%;
+                top: 7%;
+            }
+        }
+
+        /* 時鐘1數字的角度調整 */
+        #clock .numbers span b {
+            font-family: "Luxurious Roman", serif;
+            font-weight: 300;
+            font-style: normal;
+            display: inline-block;
+            transform: rotate(calc(-30deg * var(--i)))
+        }
+
+        /* 時鐘1 內圈的數字、圖片位置 */
+        #clock .numbers2 span {
+            position: absolute;
+            inset: 120px;
+            text-align: center;
+            color: #000;
+            font-size: 0.8em;
+            transform: rotate(calc(90deg * var(--a)));
+
+            .logo-13,
+            .logo-14,
+            .logo-15,
+            .logo-tactics {
+                position: absolute;
+                z-index: -1;
+                transform: rotate(calc(-90deg * var(--a)));
+            }
+
+            .logo-13 {
+                width: 40px;
+                height: 40px;
+                left: 50%;
+                top: -18%;
+            }
+
+            .logo-14 {
+                width: 50px;
+                height: 50px;
+                left: 25%;
+                top: -35%;
+            }
+
+            .logo-15 {
+                width: 50px;
+                height: 50px;
+                left: -10%;
+                top: -25%;
+            }
+
+            .logo-tactics {
+                width: 80px;
+                height: 50px;
+                left: 0%;
+                top: -10%;
+            }
+        }
+
+        /* 時鐘1　內圈的文字角度調整*/
+        #clock .numbers2 span b {
+            font-family: "Luxurious Roman", serif;
+            font-weight: 300;
+            font-style: normal;
+            display: inline-block;
+            transform: rotate(calc(-90deg * var(--a)))
+        }
+
+        /* 時鐘2中心點 */
+        .clock2-dot {
+            content: '';
+            position: absolute;
+            top: calc(50% - 2px);
+            left: calc(50% - 2px);
+            width: 4px;
+            height: 4px;
+            background: #e95e1e;
+            border-radius: 50%;
+            z-index: 1000;
+            box-shadow: 0 0 1px #e95e1e,
+                0 0 0 3px #fff,
+                0 0 5px 5px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 時鐘2 */
+        #clock2 {
+            width: 350px;
+            height: 350px;
+            background: #152b4a;
+            border-radius: 50%;
+            position: relative;
+            left: 75%;
+            border: 10px solid rgba(255, 255, 255, 1);
+            box-shadow: 5px 5px 15px #152b4a66,
+                inset 0px 0px 5px rgba(170, 65, 65, 0.75),
+                -6px -6px 10px rgba(255, 255, 255, 1);
+            z-index: 900;
+        }
+
+        /* 時鐘2的時針 */
+        #hour2 {
+            width: 28%;
+            height: 3px;
+            background: white;
+            position: absolute;
+            left: 22%;
+            top: 50%;
+            transform-origin: right center;
+            z-index: 10;
+        }
+
+        /* 時鐘2的分針 */
+        #minute2 {
+            width: 25%;
+            height: 2.5px;
+            background: white;
+            border-radius: 5px;
+            position: absolute;
+            left: 25%;
+            top: 50%;
+            transform-origin: right center;
+            z-index: 10;
+        }
+
+        /* 時鐘2的秒針 */
+        #second2 {
+            width: 35%;
+            height: 2px;
+            background: #e95e1e;
+            border-radius: 5px;
+            position: absolute;
+            left: 15%;
+            top: 50%;
+            transform-origin: right center;
+            z-index: 10;
+        }
+
+        /* 時鐘2的數字位置 */
+        #clock2 span {
+            position: absolute;
+            inset: 5px;
+            text-align: center;
+            color: #fff;
+            font-size: 2em;
+            transform: rotate(calc(90deg * var(--i)));
+        }
+
+        /* 時鐘2的數字角度調整 */
+        #clock2 span b {
+            font-weight: 600;
+            display: inline-block;
+            transform: rotate(calc(-90deg * var(--i)))
+        }
+
+        /* 時鐘2的內圈 */
+        #clock2::before {
+            content: '';
+            position: absolute;
+            inset: 8px;
+            background: linear-gradient(#f36e21, #7d1ee9);
+            border-radius: 50%;
+            animation: animate 4s linear infinite;
+        }
+
+        /* 時鐘2內圈動畫*/
+        @keyframes animate {
+            0% {
+                transform: rotate(360deg);
+            }
+
+            100% {
+                transform: rotate(0deg);
+            }
+        }
+
+        /* 時鐘2遮住內圈，這樣就只會有外圈漸層轉圈圈的效果 */
+        #clock2::after {
+            content: '';
+            position: absolute;
+            inset: 40px;
+            background: #152b4a;
+            border-radius: 50%;
+            animation: animate 2s linear infinite;
+        }
+
+        /* 字型設定 */
+        @font-face {
+            font-family: 'PixeloidSansBold';
+            src: url('./PixeloidSansBold-PKnYd.ttf')
+        }
+
+        /* 背景影片容器遮色片 */
+        .background-video {
+            position: absolute;
+            width: 100vw;
+            height: 99vh;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            filter: blur(10px) opacity(60%);
+            background-repeat: no-repeat;
+            background-size: contain;
+            background-position: center;
+        }
+
+        /* 背景影片 */
+        .background-video video {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 螢幕 */
+        .tv {
+            position: absolute;
+            width: 800px;
+            height: 460px;
+            border: 5px solid white;
+            box-shadow: 0 5px 10px black, inset 0 0 10px #777;
+            left: 30%;
+            top: 35%;
+            background-repeat: no-repeat;
+            background-size: contain;
+        }
+
+        /* 螢幕內的動畫 */
+        .tv video {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid black;
+            box-shadow: 0 0 10px #777;
+        }
+
+        /* 螢幕底座 */
+        .tv::before {
+            content: '';
+            position: absolute;
+            background: white;
+            border: 1px solid black;
+            border-radius: 50px 50px 15px 15px;
+            top: 113%;
+            left: calc(50% - 110px);
+            width: 200px;
+            height: 20px;
+            box-shadow: 0 5px 20px black, inset 0 0 10px #777;
+            z-index: 10;
+        }
+
+        /* 螢幕支撐底座 */
+        .tv::after {
+            content: '';
+            position: absolute;
+            background: white;
+            top: calc(101% + 1px);
+            left: calc(50% - 20px);
+            box-shadow: 0 10px 10px black, inset 0 0 10px #777;
+            width: 20px;
+            height: 60px;
+        }
+
+        .tv p {
+            color: white;
+            font-size: 20px;
+            text-align: center;
+            font-weight: bold;
+            display: none
+        }
+
+        #MyCanvas {
+            box-sizing: border-box;
+            width: 600px;
+            height: 350px;
+            background: black;
+            border: 5px solid lightblue;
+            position: absolute;
+            top: calc(50% - 175px);
+            left: calc(50% - 300px);
+            display: none;
+        }
+
+
+        /* 時鐘文字容器樣式 */
+        .clock-text {
+            position: absolute;
+            left: 1%;
+            top: 83%;
+            width: 500px;
+            height: 150px;
+            text-align: center;
+            line-height: 110px;
+            background: black;
+            border-radius: 10px;
+            cursor: default;
+            z-index: 100;
+            /* animation: animates 8s linear infinite; */
+        }
+
+        /* 時鐘文字、播放影片按鈕容器 */
+        .clock-text .display {
+            height: 80px;
+            width: 485px;
+            background: black;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        /* 時區的地區文字 */
+        .local-text {
+            font-size: 40px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-right: 30px;
+            font-weight: bolder;
+            background: linear-gradient(135deg, #14ffe9, #ffeb3b, #ff00e0);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: animates 8s linear infinite;
+        }
+
+        /* 時區的時間文字 */
+        .text {
+            line-height: 80px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #43ff14, #ffeb3b, #ff00e0);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-family: 'PixeloidSansBold';
+            animation: animates 8s linear infinite;
+        }
+
+        /* 功能按鍵容器 */
+        .clock-text .display-list {
+            height: 70px;
+            width: 485px;
+            background: black;
+            border-radius: 6px;
+            text-align: center;
+            padding-top: 10px;
+        }
+
+        /* 貪食蛇遊戲按鈕 */
+        .display-list .btn-snake {
+            display: inline-block;
+            height: 45px;
+
+            i {
+                text-align: center;
+                font-size: 25px;
+                color: white;
+                padding: 10px;
+                border-radius: 5px;
+
+                &:hover {
+                    cursor: pointer;
+                    background: #222;
+                }
+            }
+        }
+
+        /* 上一個影片按鈕 */
+        .display-list .btn-previous {
+            display: inline-block;
+            height: 45px;
+
+            i {
+                text-align: center;
+                font-size: 25px;
+                color: white;
+                padding: 10px;
+                border-radius: 5px;
+
+                &:hover {
+                    cursor: pointer;
+                    background: #222;
+                }
+            }
+        }
+
+        /* 播放/停止 影片按鈕 */
+        .display-list .btn-play {
+            display: inline-block;
+            height: 45px;
+
+            i {
+                text-align: center;
+                font-size: 25px;
+                color: white;
+                padding: 10px;
+                border-radius: 5px;
+
+                &:hover {
+                    cursor: pointer;
+                    background: #222;
+                }
+            }
+        }
+
+        /* 下一個影片按鈕 */
+        .display-list .btn-next {
+            display: inline-block;
+            height: 45px;
+
+            i {
+                text-align: center;
+                font-size: 25px;
+                color: white;
+                padding: 10px;
+                border-radius: 5px;
+
+                &:hover {
+                    cursor: pointer;
+                    background: #222;
+                }
+            }
+        }
+
+        /* 靜音/聲音按鍵 */
+        .display-list .btn-volume {
+            display: inline-block;
+            height: 45px;
+
+            i {
+                text-align: center;
+                font-size: 25px;
+                color: white;
+                padding: 10px;
+                border-radius: 5px;
+
+                &:hover {
+                    cursor: pointer;
+                    background: #222;
+                }
+            }
+        }
+
+        /* 往上垂直對齊 */
+        .display-list i {
+            vertical-align: top;
+        }
+
+        /* 時鐘文字動畫 */
+        @keyframes animates {
+            100% {
+                filter: hue-rotate(360deg);
+            }
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Luxurious+Roman&display=swap" rel="stylesheet">
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css'
+        integrity='sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=='
+        crossorigin='anonymous' />
+</head>
+
+<body>
+    <!-- 背景影片 -->
+    <div class="background-video">
+        <video muted autoplay loop>
+            <source src="./FINAL_FANTASY_PIXEL_REMASTER___Promotional_Trailer.mp4" type="video/mp4">
+        </video>
+    </div>
+    <!-- 螢幕 -->
+    <div class="tv-content">
+        <div class="tv">
+            <video muted autoplay loop>
+                <source src="./FINAL_FANTASY_PIXEL_REMASTER___Promotional_Trailer.mp4" type="video/mp4">
+            </video>
+            <p>分數:<span id="text-score">0</span> | 最高分數:<span id="text-hight-score">0</span></p>
+            <canvas id="MyCanvas"></canvas>
+        </div>
+    </div>
+
+    <!-- 側邊攔位 -->
+    <div class="sidebar">
+        <ul>
+            <li><button class="btn-1">切換時區<span class="btn-1-text">
+                        <<span></button></li>
+            <li><button class="btn-2">切換時鐘樣式</button></li>
+            <li><button id="drage-btn">拖曳切換</button></li>
+        </ul>
+    </div>
+
+    <!-- 側邊欄位選單 -->
+    <div class="zone-list">
+        <ul>
+            <li class="select-option">台灣</li>
+            <li class="select-option">日本</li>
+            <li class="select-option">香港</li>
+            <li class="select-option">韓國</li>
+            <li class="select-option">美國-洛杉磯</li>
+            <li class="select-option">美國-紐約</li>
+            <li class="select-option">英國-倫敦</li>
+        </ul>
+    </div>
+
+    <!-- 時鐘1 -->
+    <div id="clock" class="content">
+        <div id="hour"></div>
+        <div id="minute"></div>
+        <div id="second"></div>
+        <div class="numbers"></div>
+        <div class="numbers2"></div>
+    </div>
+    <!-- 時區的地區、時間 -->
+    <div class="clock-text">
+        <div class="display">
+            <span class="local-text">台灣</span>
+            <span class="text">00:00:00</span>
+        </div>
+        <div class="display-list">
+            <div class="btn-snake"><i class="fa-solid fa-staff-snake"></i></div>
+            <div class="btn-previous"><i class="fa-solid fa-backward"></i></div>
+            <div class="btn-play"><i class="fa-solid fa-stop"></i></div>
+            <div class="btn-next"><i class="fa-solid fa-forward"></i></div>
+            <div class="btn-volume"><i class="fa-solid fa-volume-xmark"></i></div>
+        </div>
+    </div>
+
+    <!-- 時鐘2 -->
+    <div id="clock2" class="content hidden">
+        <div class="numbers">
+            <span style="--i:0;"><b>12</b></span>
+            <span style="--i:1;"><b>3</b></span>
+            <span style="--i:2;"><b>6</b></span>
+            <span style="--i:3;"><b>9</b></span>
+        </div>
+        <div id="hour2"></div>
+        <div id="minute2"></div>
+        <div id="second2"></div>
+        <div class="clock2-dot"></div>
+    </div>
+    <!-- luxon時間套件 -->
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.5.0/build/global/luxon.min.js"></script>
+
+    <script>
+        // 時鐘1的時間
+        const elHour = document.getElementById('hour')
+        const elMinute = document.getElementById('minute')
+        const elSecond = document.getElementById('second')
+        // 時鐘2的時間
+        const elHour2 = document.getElementById('hour2')
+        const elMinute2 = document.getElementById('minute2')
+        const elSecond2 = document.getElementById('second2')
+        // 顯示時間文字
+        const elText = document.querySelector('.text')
+        // 側邊欄位按鈕1(切換時區)
+        const btn1 = document.querySelector('.btn-1')
+        // 側邊欄位按鈕1的文字符號(切換時區)
+        const btn1Text = document.querySelector('.btn-1-text')
+        // 側邊欄位按鈕2(切換風格)
+        const btn2 = document.querySelector('.btn-2')
+        // 顯示時區文字
+        const localText = document.querySelector('.local-text')
+        // 切換時區選單
+        const zoneSelect = document.querySelector('.zone-list')
+        // 切換時區選項
+        const zoneSelectOption = document.querySelectorAll('.select-option')
+        // luxon套件時間
+        const DateTime = luxon.DateTime;
+        // 時區
+        const zonelang = ['Asia/Taipei', 'Japan', 'Asia/Hong_Kong', 'Asia/Seoul', 'America/Los_Angeles', 'America/New_York', 'Europe/London']
+        // 檢查點擊時區選單狀態
+        let isClicked = false;
+        // 點擊切換風格狀態
+        let isClicked2 = false;
+        // 時區選擇計數
+        let zoneCount = 0;
+        // 時鐘2
+        const elClock2 = document.getElementById('clock2')
+        // 時鐘1
+        const elClock = document.getElementById('clock')
+        // 螢幕
+        const tv = document.querySelector('.tv')
+        // 背景影片容器
+        const bacgkroundVideo = document.querySelector('.background-video')
+        // 時鐘文字
+        const elClockText = document.querySelector('.clock-text')
+        // 切換拖曳按鍵
+        const drageBtn = document.getElementById('drage-btn')
+        // 圖片
+        const logo = document.querySelectorAll('img')
+        // 切換貪食蛇遊戲按鈕
+        const btnSnakeGame = document.querySelector('.btn-snake')
+        // 切換貪食蛇遊戲icon
+        const btnSnakeGameIcon = document.querySelector('.btn-snake>i')
+        // 切換貪食蛇遊戲狀態
+        let isSnakeClicked = false;
+        // 貪食蛇分數
+        let score = 0;
+        // 貪食蛇分數容器
+        const snakeGameScoreContent = document.querySelector('.tv>p')
+        // 貪食蛇分數文字
+        const snakeGameScore = document.getElementById('text-score')
+        // 貪食蛇最高分數文字
+        const snakeGameHightScore = document.getElementById('text-hight-score')
+        // 貪食蛇計時器
+        let Game = 0;
+        // 貪食蛇分數最高分
+        const highscore = {
+            name: "user",
+            score: 0
+        }
+        // 水果產生的新座標
+        let newX = 0;
+        let newY = 0;
+        // 水果與蛇座標重疊
+        let isOverlapping = false;
+
+        // 切換影片按鈕
+        const btnPrevious = document.querySelector('.btn-previous')
+        const btnPlay = document.querySelector('.btn-play')
+        const btnNext = document.querySelector('.btn-next')
+        const btnVolume = document.querySelector('.btn-volume')
+        // 播放影片按鈕觸發狀態
+        let isPlayState = false
+        // 聲音按鍵觸發狀態
+        let isVolumeState = true
+
+        //背景影片src清單
+        const videolist = ["./FINAL_FANTASY_PIXEL_REMASTER___Promotional_Trailer.mp4", "./Final Fantasy Pixel Remaster_January Sale Trailer.mp4", "FF PIXEL REMASTER Console version Promotion Trailer.mp4"]
+
+        // 時鐘內、外圈圖片、文字
+        const logos = {
+            "area": [
+                { text: "XII", src: "./images/12_XII.png", alt: 'Final Fantasy logo12' },
+                { text: "I", src: "./images/1_I.png", alt: 'Final Fantasy logo1' },
+                { text: "II", src: "./images/2_II.png", alt: 'Final Fantasy logo2' },
+                { text: "III", src: "./images/3_III.png", alt: 'Final Fantasy logo3' },
+                { text: "IV", src: "./images/4_IV.png", alt: 'Final Fantasy logo4' },
+                { text: "V", src: "./images/5_V.png", alt: 'Final Fantasy logo5' },
+                { text: "VI", src: "./images/6_VI.png", alt: 'Final Fantasy logo6' },
+                { text: "VII", src: "./images/7_VII.png", alt: 'Final Fantasy logo7' },
+                { text: "VIII", src: "./images/8_VIII.png", alt: 'Final Fantasy logo8' },
+                { text: "IX", src: "./images/9 IX.png", alt: 'Final Fantasy logo9' },
+                { text: "X", src: "./images/10_X.png", alt: 'Final Fantasy logo10' },
+                { text: "XI", src: "./images/11_XI.png", alt: 'Final Fantasy logo11' }
+            ],
+            "area2": [
+                { text: "XIV", src: "./images/14_XIV.png", alt: 'Final Fantasy logo13', class: "logo-14" },
+                { text: "XV", src: "./images/15_XV.png", alt: 'Final Fantasy logo14', class: "logo-15" },
+                { text: "", src: "./images/TACTICS.png", alt: 'Final Fantasy logoTactics', class: "logo-tactics" },
+                { text: "XIII", src: "./images/13_XIII.png", alt: 'Final Fantasy logo16', class: "logo-13" }
+            ]
+        }
+
+        // 影片
+        const video = document.querySelectorAll('video')
+        // 影片播放的目前索引
+        let currIndex = 0
+        // 影片計時計數
+        let Time = 0;
+        // 影片計時器
+        let intervalVideo
+        // 影片總長度
+        let duration
+
+        // 紀錄拖曳後，滑鼠與元素之間的位置變數。
+        let offsetX = 0, offsetY = 0
+        // 拖曳切換狀態變數
+        let isDrageClick = false;
+
+        // 拖曳事件開始
+        window.addEventListener('dragstart', function (e) {
+            if (isDrageClick) {
+                offsetX = e.clientX - e.target.offsetLeft;
+                offsetY = e.clientY - e.target.offsetTop;
+                onMouseMove(e)
+            }
+        })
+        // 拖曳事件結束
+        window.addEventListener('dragend', function (e) {
+            if (isDrageClick) {
+                onMouseMove(e)
+            }
+        })
+
+        // 拖曳的function 
+        function onMouseMove(e) {
+            // e.client代表滑鼠目前點擊的位置，是從左上角開始計算
+            // offset 代表元素內部點擊的位置，是從左上角開始計算
+            // 透過滑鼠位置 - 元素內部點擊位置能得出精確的位置
+            let left = e.clientX - offsetX
+            let top = e.clientY - offsetY
+            // 取得時鐘元素的高、寬
+            const elementWidth = e.target.offsetWidth
+            const elementHeight = e.target.offsetHeight
+            // 取得視窗的高、寬
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            // 如果偏移 + 元素的寬度 大於視窗的寬就等於視窗的寬
+            if (left < 0)
+                left = 0
+            else if (left + elementWidth > viewportWidth)
+                left = viewportWidth - elementWidth - 10
+
+            // 如果偏移 + 元素的高度 大於視窗的高就等於視窗的高
+            if (top < 0)
+                top = 0
+            else if (top + elementHeight > viewportHeight)
+                top = viewportHeight - elementHeight - 10
+
+            // 改變觸發function物件e的left、top數值
+            e.target.style.left = `${left}px`;
+            e.target.style.top = `${top}px`;
+        }
+
+        // 切換拖曳按鍵觸發
+        drageBtn.onclick = () => {
+            isDrageClick = !isDrageClick
+            if (isDrageClick) {
+                elClock.setAttribute('draggable', 'true')
+                elClock2.setAttribute('draggable', 'true')
+                tv.setAttribute('draggable', 'true')
+                elClockText.setAttribute('draggable', 'true')
+                alert('拖曳切換:開')
+            }
+            else {
+                elClock.setAttribute('draggable', 'false')
+                elClock2.setAttribute('draggable', 'false')
+                tv.setAttribute('draggable', 'false')
+                elClockText.setAttribute('draggable', 'false')
+                alert('拖曳切換:關')
+            }
+        }
+
+        // 時鐘1、2的3個指針度數計算、顯示時間文字 function
+        const clock = () => {
+            const date = DateTime.local()
+            const rezone = DateTime.fromObject({}, { zone: zonelang[zoneCount] })
+            const hour = rezone.hour
+            const minute = rezone.minute
+            const second = rezone.second
+
+            localText.innerText = `${zoneSelectOption[zoneCount].innerText}`
+            elHour.style.transform = `rotate(${hour * 30 + 90}deg)`
+            elMinute.style.transform = `rotate(${minute * 6 + 90}deg)`
+            elSecond.style.transform = `rotate(${second * 6 + 90}deg)`
+
+            elHour2.style.transform = `rotate(${hour * 30 + 90}deg)`
+            elMinute2.style.transform = `rotate(${minute * 6 + 90}deg)`
+            elSecond2.style.transform = `rotate(${second * 6 + 90}deg)`
+            elText.innerHTML = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:${second.toString().padStart(2, '0')}`
+        }
+
+        // 按下切換時區按鈕跳出選單
+        btn1.addEventListener('click', (event) => {
+            event.stopPropagation()
+            isClicked = !isClicked
+            if (isClicked) {
+                zoneSelect.style.display = 'block'
+                btn1Text.innerText = ' >'
+            } else {
+                zoneSelect.style.display = 'none'
+                btn1Text.innerText = ' <'
+            }
+        })
+
+        //切換時區選單選擇後隱藏選單
+        zoneSelectOption.forEach((element, index) => {
+            element.onclick = () => {
+                zoneCount = index
+                clock()
+                zoneSelect.style.display = 'none'
+                isClicked = false;
+                btn1Text.innerText = ' <'
+            }
+        })
+
+        //偵測當點擊非時區選單時的位置就隱藏選單
+        document.body.addEventListener('click', (event) => {
+            if (isClicked) {
+                zoneSelect.style.display = 'none'
+                isClicked = false;
+                btn1Text.innerText = ' <'
+            }
+        })
+
+        // 切換時鐘樣式按鍵
+        btn2.addEventListener('click', () => {
+            isClicked2 = !isClicked2
+            changeStyle(isClicked2)
+        })
+
+        // 播放影片按鈕
+        btnPlay.onclick = () => {
+            if (isSnakeClicked)
+                return
+
+            isPlayState = !isPlayState
+            if (isPlayState) {
+                clearInterval(intervalVideo)
+                videoPause()
+            }
+            else {
+                startInterrval()
+                videoPlay()
+            }
+            console.log("btnPlay", isPlayState)
+        }
+
+        // 影片讀取完後事件
+        video[1].onloadedmetadata = () => {
+            duration = Math.floor(video[1].duration)
+        }
+
+        // 影片可以播放後事件
+        video[1].oncanplaythrough = () => {
+            duration = Math.floor(video[1].duration)
+            // console.log(duration)            
+        }
+
+        // 影片計時function
+        startInterrval()
+
+        function startInterrval() {
+            clearInterval(intervalVideo)
+            Time = 0;
+
+            intervalVideo = setInterval(() => {
+                Time += 1
+                // console.log(Time)
+                if (Time >= duration) {
+                    Time = 0
+
+                    currIndex++
+                    if (currIndex >= videolist.length) {
+                        currIndex = 0
+                    }
+                    videoPlay()
+                    clearInterval(intervalVideo)
+
+                    setTimeout(startInterrval, 0)
+                }
+            }, 1000)
+        }
+
+        //下一個影片
+        btnNext.onclick = () => {
+            if (isSnakeClicked)
+                return
+
+            currIndex++
+            if (currIndex >= videolist.length) {
+                currIndex = 0
+            }
+            videoPlay()
+            startInterrval()
+        }
+        //上一個影片
+        btnPrevious.onclick = () => {
+            if (isSnakeClicked)
+                return
+
+            currIndex--
+            if (currIndex < 0) {
+                currIndex = videolist.length - 1
+            }
+            videoPlay()
+            startInterrval()
+        }
+        // 靜音/音量
+        btnVolume.onclick = () => {
+            if (isSnakeClicked)
+                return
+
+            isVolumeState = !isVolumeState
+            if (!isVolumeState) {
+                video[1].muted = false
+                video[1].volume = "0.5"
+                btnVolume.innerHTML = `<i class="fa-solid fa-volume-high"></i>`
+            }
+            else if (isVolumeState) {
+                video[1].muted = true
+                btnVolume.innerHTML = `<i class="fa-solid fa-volume-xmark"></i>`
+            }
+        }
+        // 播放影片
+        function videoPlay() {
+            for (let i = 0; i < video.length; i++) {
+                video[i].src = videolist[currIndex]
+                video[i].play()
+            }
+            btnPlay.innerHTML = `<i class="fa-solid fa-stop"></i>`
+        }
+        // 停止影片
+        function videoPause() {
+            for (let i = 0; i < video.length; i++) {
+                video[i].pause()
+            }
+            btnPlay.innerHTML = `<i class="fa-solid fa-play"></i>`
+        }
+
+
+
+        // 貪食蛇遊戲按下事件
+        btnSnakeGame.onclick = () => {
+            isSnakeClicked = !isSnakeClicked
+
+            if (isSnakeClicked) {
+                // 停止影片
+                clearInterval(intervalVideo)
+                videoPause()
+                if (!isPlayState) {
+                    isPlayState = true
+                }
+                // 影片不顯示
+                video[0].style.display = 'none'
+                video[1].style.display = 'none'
+                // 更改背景圖片
+                tv.style.backgroundImage = `url('./final-fantasy-xiv-endwalker.jpg')`
+                bacgkroundVideo.style.backgroundImage = `url('./final-fantasy-xiv-endwalker.jpg')`
+                // icon改色
+                btnSnakeGameIcon.style.color = 'yellow'
+                // 顯示貪食蛇遊戲區塊
+                canvas.style.display = 'block'
+                // 顯示貪食蛇遊戲分數
+                snakeGameScoreContent.style.display = 'block'
+                Game = setInterval(snakCheck, 100)
+            } else {
+                // 播放影片
+                videoPlay()
+                startInterrval()
+                if (isPlayState) {
+                    isPlayState = false
+                }
+                // 影片顯示
+                video[0].style.display = 'block'
+                video[1].style.display = 'block'
+                // 更改背景圖片
+                tv.style.backgroundImage = ""
+                bacgkroundVideo.style.backgroundImage = ""
+                // icon改色
+                btnSnakeGameIcon.style.color = 'white'
+                // 不顯示貪食蛇遊戲區塊
+                canvas.style.display = 'none'
+                // 不顯示貪食蛇遊戲分數
+                snakeGameScoreContent.style.display = 'none'
+                removeGame()
+            }
+        }
+
+        // 切換樣式的function，偵測切換時鐘的變數
+        // 按下變成true後，讓時鐘1透明度變成0
+        // 再利用計時器過0.5秒後讓時鐘1的display -> none，時鐘2的display ->　block　透明度為0
+        // 再過0.05秒後　讓時鐘2的透明度成1　就會有淡出的效果
+        // else 的部分也是，換時鐘2消失，時鐘1顯示
+        function changeStyle(index) {
+            if (index) {
+                elClock.style.opacity = '0'
+
+                setTimeout(() => {
+                    elClock.style.display = 'none'
+                    elClock2.style.display = 'block'
+                    elClock2.style.opacity = '0'
+
+                    elClock2.style.top = elClock.style.top
+                    elClock2.style.left = elClock.style.left
+
+                    setTimeout(() => {
+                        elClock2.style.opacity = '1'
+                    }, 50)
+                }, 500)
+            } else {
+                elClock2.style.opacity = '0'
+                setTimeout(() => {
+                    elClock2.style.display = 'none'
+                    elClock.style.display = 'block'
+                    elClock.style.opacity = '0'
+
+                    elClock.style.top = elClock2.style.top
+                    elClock.style.left = elClock2.style.left
+
+                    setTimeout(() => {
+                        elClock.style.opacity = '1'
+                    }, 50)
+                }, 500)
+            }
+        }
+        // 每1秒執行一次clock function，讓時間更新
+        clock()
+        setInterval(clock, 1000)
+
+        // 時鐘1外圈的圖片文字HTML
+        // Object.values可以將物件轉成陣列
+        Object.values(logos.area).forEach((imgs, index) => {
+            const numbers = document.querySelector('.numbers')
+            const span = document.createElement('span')
+            const b = document.createElement('b')
+            const img = document.createElement('img')
+            span.style.setProperty("--i", index)
+            b.innerText = imgs.text
+            img.classList.add(`logo-${index}`)
+            img.src = imgs.src
+            img.alt = imgs.alt
+            img.draggable = false
+            span.append(b, img)
+            numbers.append(span)
+        })
+
+        // 時鐘1內圈的圖片文字HTML
+        Object.values(logos.area2).forEach((imgs, index) => {
+            const numbers2 = document.querySelector('.numbers2')
+            const span = document.createElement('span')
+            const b = document.createElement('b')
+            const img = document.createElement('img')
+
+            span.style.setProperty("--a", index)
+            b.innerText = imgs.text
+            img.classList.add(imgs.class)
+            img.src = imgs.src
+            img.alt = imgs.alt
+            img.draggable = false
+            span.append(b, img)
+            numbers2.append(span)
+        })
+
+        const canvas = document.getElementById('MyCanvas')
+        const ctx = canvas.getContext('2d')
+        // 高、寬單位
+        const unit = 10;
+        // 計算canvas寬度格數
+        const column = canvas.width / unit;
+        // 計算canvas高度格數
+        const row = canvas.height / unit;
+
+        // 貪食蛇的初始座標
+        let snake = [
+            {
+                x: 80,
+                y: 0
+            },
+            {
+                x: 70,
+                y: 0
+            },
+            {
+                x: 60,
+                y: 0
+            },
+            {
+                x: 50,
+                y: 0
+            }
+        ]
+
+        // 水果初始座標
+        let fruit =
+        {
+            x: Math.floor(Math.random() * column) * unit,
+            y: Math.floor(Math.random() * row) * unit
+        }
+        // 預設方向
+        let direction = 'Right';
+
+        // 監視按下事件觸發changeDirection function
+        window.addEventListener('keydown', changeDirection)
+
+        // 避免因連續按不同方向導致畫面跟座標未同步
+        function changeDirection(e) {
+            if (e.key == 'ArrowRight' && direction != 'Left') {
+                direction = 'Right'
+            } else if (e.key == 'ArrowDown' && direction != 'Up') {
+                direction = 'Down'
+            } else if (e.key == 'ArrowLeft' && direction != 'Right') {
+                direction = 'Left';
+            } else if (e.key == 'ArrowUp' && direction != 'Down') {
+                direction = 'Up'
+            }
+            window.removeEventListener('keydown', changeDirection);
+        }
+
+        // 讀取最高分數
+        if (localStorage.Game) {
+            const data = JSON.parse(localStorage.Game)
+            highscore.score = data.score
+            snakeGameHightScore.innerText = `${highscore.score}`
+        }
+
+        // 貪食蛇遊戲結束
+        function removeGame() {
+            // 清除計時器
+            clearInterval(Game)
+            // canvas填充的顏色為黑色
+            ctx.fillStyle = 'black'
+            // canvas填充的座標 x y 寬 高
+            ctx.fillRect(0, 0, canvas.width, canvas.height)
+            // 儲存最高分數判斷
+            if (score > highscore.score) {
+                highscore.score = score;
+                localStorage.Game = JSON.stringify(highscore)
+                snakeGameHightScore.innerText = `${highscore.score}`
+            }
+            // 初始化分數
+            score = 0;
+            // 更新分數文字
+            snakeGameScore.innerText = `${score}`
+            alert('遊戲結束')
+
+            // 重置蛇的座標
+            snake = [
+                {
+                    x: 80,
+                    y: 0
+                },
+                {
+                    x: 70,
+                    y: 0
+                },
+                {
+                    x: 60,
+                    y: 0
+                },
+                {
+                    x: 50,
+                    y: 0
+                }
+            ]
+
+            // 判斷蛇的位置與水果的位置是否相同
+            if (snake[0].x == fruit.x && snake[0].y == fruit.y) {
+                fruitCheck()
+            }
+
+            // 如果切換貪食蛇遊戲狀態還是true，那過1秒後會重新執行
+            if (isSnakeClicked) {
+                Game = setInterval(snakCheck, 100)
+            } else {
+                return;
+            }
+
+        }
+
+        // 貪食蛇遊戲
+        function snakCheck() {
+            // 如果蛇頭的x y座標跟蛇身x y座標相同，代表咬到自己，就讓遊戲結束
+            for (let i = 1; i < snake.length; i++) {
+                if (snake[i].x == snake[0].x && snake[i].y == snake[0].y) {
+                    removeGame()
+                    return;
+                }
+            }
+
+            // console.log(fruit.x, fruit.y)
+            // console.log(snake[0].x, snake[0].y)
+
+            // 先將canvas全部填充黑色
+            ctx.fillStyle = 'black'
+            ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+            // canvas 把水果的區塊填充出來
+            ctx.fillStyle = 'yellow'
+            ctx.fillRect(fruit.x, fruit.y, unit, unit)
+
+            // canvas 將蛇頭、蛇身填充出來
+            for (let i = 0; i < snake.length; i++) {
+                if (i == 0) {
+                    ctx.fillStyle = 'lightgreen'
+                } else {
+                    ctx.fillStyle = 'lightblue'
+                }
+                // 填充區塊邊框顏色
+                ctx.strokeStyle = 'white'
+
+                // 蛇寬
+                if (snake[i].x >= canvas.width) {
+                    snake[i].x = 0;
+                } else if (snake[i].x < 0) {
+                    snake[i].x = canvas.width - unit;
+                }
+
+                // 蛇高
+                if (snake[i].y >= canvas.height) {
+                    snake[i].y = 0;
+                } else if (snake[i].y < 0) {
+                    snake[i].y = canvas.height - unit;
+                }
+                // 將蛇填充出來
+                ctx.fillRect(snake[i].x, snake[i].y, unit, unit)
+                ctx.strokeRect(snake[i].x, snake[i].y, unit, unit)
+            }
+
+            // 蛇頭座標
+            let snakeX = snake[0].x;
+            let snakeY = snake[0].y;
+
+            // 判斷方向，依照方向去減少、增加水平x、垂直y 座標
+            if (direction === 'Left') {
+                snakeX -= unit;
+            }
+            if (direction === 'Right') {
+                snakeX += unit;
+            }
+            if (direction === 'Up') {
+                snakeY -= unit;
+            }
+            if (direction === 'Down') {
+                snakeY += unit;
+            }
+
+            // 紀錄增加減少後的蛇頭座標
+            let newHead = {
+                x: snakeX,
+                y: snakeY
+            };
+
+            // 判斷蛇頭與水果座標相符，分數增加、更改分數文字、重新生成水果位置
+            // 如果沒有，用pop方法移除陣列中的最後一個元素
+            if (snake[0].x == fruit.x && snake[0].y == fruit.y) {
+                score += 1
+                snakeGameScore.innerText = `${score}`
+                fruitCheck()
+            } else {
+                snake.pop()
+            }
+            // unshift方法增加元素到陣列的開頭
+            snake.unshift(newHead)
+            // console.log(snake)
+            // 重新增加按下事件，讓蛇與按下同步
+            window.addEventListener('keydown', changeDirection)
+        }
+
+        // 水果產生
+        function fruitCheck() {
+            do {
+                newX = Math.floor(Math.random() * column) * unit;
+                newY = Math.floor(Math.random() * row) * unit;
+                checkOverlap(newX, newY)
+            } while (isOverlapping)
+
+            fruit.x = newX
+            fruit.y = newY
+        }
+
+        // 檢查水果產生時的位置有沒有與蛇重疊
+        function checkOverlap(new_x, new_y) {
+            for (let i = 0; i < snake.length; i++) {
+                if (newX == snake[i].x && newY == snake[i].y) {
+                    isOverlapping = true;
+                    return;
+                }
+                else {
+                    isOverlapping = false;
+                }
+            }
+        }
+
+    </script>
+</body>
+
+</html>
